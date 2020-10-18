@@ -1,0 +1,37 @@
+---
+# tasks file for setup_web
+
+- name: install Apache
+  apt:
+    pkg:
+    - apache2 
+    - wordpress 
+    - php7.3-ldap
+    - unzip
+    state: present
+- name: setup need module rewrite
+  shell: a2enmod rewrite
+- name: setup need module vhost_alias
+  shell: a2enmod vhost_alias
+- name: setup need module authnz_ldap
+  shell: a2enmod authnz_ldap
+- name: copy wp apache config
+  copy:
+    src: wp.conf
+    dest: /etc/apache2/sites-available/
+    mode: 0644
+- name: copy wp config
+  copy:
+    src: config-default.php
+    dest: /etc/wordpress/
+    mode: 0644
+- name: copy wp ldap plugin
+  copy:
+    src: ldap-login-for-intranet-sites.3.5.93.zip
+    dest: /var/lib/wordpress/wp-content/plugins/
+    mode: 0644
+- name: unzip ldap plugin
+  shell: cd /var/lib/wordpress/wp-content/plugins/ && unzip ldap-login-for-intranet-sites.3.5.93.zip
+- name: set wp as default site
+  shell: a2dissite 000-default && a2ensite wp
+  notify: restart Apache

@@ -1,0 +1,13 @@
+---
+# tasks file for serviceuser
+  - name: create serviceuser
+    user: 
+      name: serviceuser
+      shell: /bin/bash
+      createhome: yes 
+      state: present
+  - name: copy sudoers serviceuser file
+    copy:
+      src: serviceuser
+      dest: /etc/sudoers.d/
+      mode: 0440

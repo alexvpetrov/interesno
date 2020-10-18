@@ -1,0 +1,26 @@
+---
+# tasks file for setup_bd
+
+  - name: install MySQL
+    apt:
+      name: default-mysql-server
+      state: present
+  - name: copy config mariadb file
+    copy:
+      src: 50-server.cnf
+      dest: /etc/mysql/mariadb.conf.d/
+      mode: 0644
+  - name: copy sql script
+    copy:
+      src: wp.sql
+      dest: /home/vagrant/
+      mode: 0644
+  - name: create DB wordpress
+    shell: cat ~vagrant/wp.sql | mysql --defaults-extra-file=/etc/mysql/debian.cnf
+    notify: restart mysql
+  - name: copy to vm db dump
+    copy:
+      src: wordpress_dump.sql
+      dest: /home/vagrant/
+  - name: restore db dump
+    shell: mysql wordpress < ~vagrant/wordpress_dump.sql
